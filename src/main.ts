@@ -8,7 +8,7 @@ async function bootstrap(): Promise<Server> {
   if (!cachedServer) {
     const app = await NestFactory.create(AppModule);
     app.enableCors({
-      origin: 'https://frontend-post-one.vercel.app',
+      origin: true,
       methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
       credentials: true,
     });
