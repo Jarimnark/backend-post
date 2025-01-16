@@ -7,7 +7,7 @@ let cachedServer: Server;
 async function bootstrap(): Promise<Server> {
   if (!cachedServer) {
     const app = await NestFactory.create(AppModule);
-    app.enableCors(); // Optional, based on your requirements
+    app.enableCors({ origin: 'frontend-post-one.vercel.app' }); // Optional, based on your requirements
     await app.init();
 
     const server = createServer((req: IncomingMessage, res: ServerResponse) => {
