@@ -1,10 +1,28 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
+import { createServer, IncomingMessage, Server, ServerResponse } from 'http';
 
-async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+let cachedServer: Server;
 
-  app.enableCors();
-  await app.listen(process.env.PORT ?? 3000);
+async function bootstrap(): Promise<Server> {
+  if (!cachedServer) {
+    const app = await NestFactory.create(AppModule);
+    app.enableCors(); // Optional, based on your requirements
+    await app.init();
+
+    const server = createServer((req: IncomingMessage, res: ServerResponse) => {
+      app.getHttpAdapter().getInstance()(req, res);
+    });
+
+    cachedServer = server;
+  }
+
+  return cachedServer;
 }
-bootstrap();
+export default async function handler(
+  req: IncomingMessage,
+  res: ServerResponse,
+) {
+  const server = await bootstrap();
+  server.emit('request', req, res);
+}
